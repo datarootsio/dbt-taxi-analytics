@@ -1,0 +1,10 @@
+default:
+  target: dbks
+  outputs:
+    dbks:
+      type: databricks
+      catalog: main
+      schema: "{{ env_var('DBT_SCHEMA', 'dbt_' ~ env_var('USER', 'live')) }}"
+      host: "{{ env_var('DBSQLCLI_HOST_NAME') }}"
+      http_path: "{{ env_var('DBSQLCLI_HTTP_PATH') }}"
+      token: "{{ env_var('DATABRICKS_AAD_TOKEN') }}"

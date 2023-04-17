@@ -4,7 +4,7 @@
 
 with -- !!!
     tripdata as (
-        select *, row_number() over (partition by cast(vendorid as integer), lpep_pickup_datetime) as rn
+        select *, row_number() over (partition by cast(vendorid as integer), lpep_pickup_datetime order by lpep_pickup_datetime) as rn
         from {{ source("staging", "green_2022") }}
         where vendorid is not null
     )
@@ -23,7 +23,7 @@ select
 
     -- trip info
     cast(
-        case when store_and_fwd_flag = 'Y' then true else false end as boolean 
+        case when store_and_fwd_flag = 'Y' then true else false end as boolean
     ) as store_and_fwd_flag, -- Convertendo de String pra Boolean para ser mais performatico
     cast(passenger_count as integer) as passenger_count,
     cast(trip_distance as numeric) as trip_distance,
@@ -44,10 +44,3 @@ select
     0 as airport_fee  -- green_taxi não possui taxa de pegar passageiro em aeroporto
 from tripdata
 where rn = 1
-
--- dbt run --select stg_green_tripdata --var 'is_test_run: false' to not limit to hundred
-{% if var('is_test_run', default=true) %}
-
-    limit 100
-
-{% endif %}

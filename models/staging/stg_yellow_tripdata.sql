@@ -4,7 +4,7 @@
 
 with -- !!!
     tripdata as (
-        select *, row_number() over (partition by cast(vendorid as integer), tpep_pickup_datetime) as rn
+        select *, row_number() over (partition by cast(vendorid as integer), tpep_pickup_datetime order by tpep_pickup_datetime) as rn
         from {{ source("staging", "yellow_2022") }}
         where vendorid is not null
     )
@@ -48,10 +48,3 @@ select
     cast(abs(airport_fee) as numeric) as airport_fee
 from tripdata
 where rn = 1
-
--- dbt run --select stg_yellow_tripdata --var 'is_test_run: false' to not limit to hundred
-{% if var('is_test_run', default=true) %}
-
-    limit 100
-
-{% endif %}
